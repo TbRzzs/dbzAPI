@@ -1,23 +1,55 @@
-import logo from './logo.svg';
+import { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
+
+  const [characters, setCharacters] = useState([])
+  const apisURL = [
+    'https://dragonball-api.com/api/characters/',
+    'https://dragonball-api.com/api/transformations/',
+  ]
+ 
+
+  useEffect(() => {
+    fetchPromisesData()
+  }, [])
+
+
+ const fetchPromisesData = async () => {
+
+  try {
+    const promises = apisURL.map(url => fetch(url))
+    const data = await Promise.all(promises)
+    const dataJson = await Promise.all(data.map(data => data.json()))
+    let typesOfFetchedData = dataJson.map((data, index) =>({
+      type: index,
+      data: data[index]
+    }))
+
+    console.log('DataJson: ', dataJson)
+    console.log('Types of fetched data: ', typesOfFetchedData)
+
+
+
+    setCharacters(data)
+    
+  } catch (error) {
+    console.log(error)
+  }
+ }
+  console.log(characters)
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Dragon Ball API</h1>
+      <div className='characters'>
+        {characters.map(characters => (
+          <div key={characters.id}>
+            <h2>{characters.name}</h2>
+            <img src={characters.image} alt={characters.name} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
